@@ -1,18 +1,75 @@
 var express = require('express');
+var mongoose = require('mongoose');
 var app = express();
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var port = process.env.PORT || 8080;
+//db connection
+mongoose.connect('mongodb://127.0.0.1:27017');
+
+//models
+var Answer = require('./model/answer');
+var Question = require('./model/question');
+var Trivia = require('./model/trivia');
+
+var port = process.env.PORT || 9090;
 
 var router = express.Router();
 
 //ROUTER
 router.get('/', function (req, res) {
-    res.json({ message: 'supa' });
+    //res.json({ message: 'supa' });
+
+    var a1 = new Answer({
+        title: "A1",
+        correct: true
+    });
+
+    var a2 = new Answer({
+        title: "А2",
+        correct: true
+    });
+
+    a1.save();
+    a2.save();
+
+    var ids = [a1._id, a2._id];
+
+    var q1 = new Question({
+        name: "Q1",
+        answers: ids
+    });
+
+    q1.save();
+
+    var t1 = new Trivia({
+        name: "T1",
+        questions: [q1._id]
+    });
+
+    t1.save();
+
+    res.json({ message: 'saved' });
+
 });
+
+router.route('/trivia')
+    .get(function (req, res) {
+
+        Question.find({})
+            .populate('answers')
+            .exec(function (err, qs) {
+                if (err)
+                    res.send(err);
+
+                res.send(JSON.stringify(qs, null, "\t"));
+            });
+
+
+
+    });
 
 
 
