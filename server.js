@@ -56,22 +56,23 @@ router.get('/', function (req, res) {
 });
 
 router.route('/trivia')
-    .get(function (req, res) {
+    .get(function (request, response) {
 
-        Question.find({})
-            .populate('answers')
-            .exec(function (err, qs) {
-                if (err)
-                    res.send(err);
+        Trivia.find({}).populate({
+            path: 'questions',
+            populate: {
+                path: 'answers',
+                model: 'Answer',
+                match: { _id: "596607d4eb16c91dd839f8c3"}
+            }
+        }).exec(function (err, result) {
+            if (err)
+                response.send(err);
 
-                res.send(JSON.stringify(qs, null, "\t"));
-            });
-
-
+            response.send(JSON.stringify(result, null, "\t"));
+        });
 
     });
-
-
 
 //register router
 app.use('/api', router);
