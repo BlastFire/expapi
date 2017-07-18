@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var TriviaSchema = new Schema({
     name: String,
+    userId: Number,
     questions: [{
         type: Schema.Types.ObjectId, ref: 'Question'
     }]
